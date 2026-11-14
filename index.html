@@ -41,37 +41,12 @@
                     <p class="text-xs text-brand-100">Daily Water Bottle Delivery & Deposit Tracker</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-end flex-wrap">
-                <button onclick="sendViaEmail()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+            <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end flex-wrap">
+                <button onclick="sendViaEmail()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
                     <i class="fa-solid fa-envelope"></i> Send Email
                 </button>
-                <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+                <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
                     <i class="fa-solid fa-file-excel"></i> Export CSV
                 </button>
-                <button onclick="window.print()" class="bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg border border-white/25 transition flex items-center gap-2">
-                    <i class="fa-solid fa-print"></i> Print
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-grow w-full space-y-6">
-
-        <!-- Summary Metric Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Entries</p>
-                    <h3 id="statTotalEntries" class="text-xl font-bold text-slate-800 mt-1">0</h3>
-                </div>
-                <div class="bg-brand-50 text-brand-600 p-3 rounded-lg">
-                    <i class="fa-solid fa-clipboard-list text-lg"></i>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Revenue (₹)</p>
-                    <h3 id="statTotalRevenue" class="text-xl font-bold text-emerald-600 mt-1">₹0.00</h3>
-                </div>
-                <div
+                <button onclick="window.print()" class="bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-lg border border-white/25 transition flex items-center gap-2">
+                    <i class
