@@ -87,4 +87,454 @@
                     <i class="fa-solid fa-vault text-lg"></i>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Pending Returns</p>
+                    <h3 id="statPendingReturns" class="text-xl font-bold text-amber-600 mt-1">0</h3>
+                </div>
+                <div class="bg-amber-50 text-amber-600 p-3 rounded-lg">
+                    <i class="fa-solid fa-rotate-left text-lg"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden block w-full">
+            <div class="bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                <h2 class="font-semibold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-brand-600"></i> New Delivery & Bottle Entry
+                </h2>
+                <span class="text-xs text-slate-500 hidden sm:inline">* Auto-punched current date & time</span>
+            </div>
+            <form id="deliveryForm" onsubmit="handleFormSubmit(event)" class="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                
+                <!-- Date & Time -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Date & Time</label>
+                    <input type="datetime-local" id="entryDateTime" required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <!-- Customer Name -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Customer Name</label>
+                    <input type="text" id="customerName" placeholder="e.g. Rajesh Sharma" required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <!-- Building Name -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Building Name</label>
+                    <input type="text" id="buildingName" placeholder="e.g. Galaxy Heights" required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <!-- Floor / Room Number -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Floor / Room No.</label>
+                    <input type="text" id="floorRoom" placeholder="e.g. 4th Floor, Flat 402" required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <!-- Bottle Size (Clean dropdown without price mention) -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Bottle Size</label>
+                    <select id="bottleSize" onchange="updateDefaultRate()" required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="200 ml">200 ml</option>
+                        <option value="500 ml">500 ml</option>
+                        <option value="1 L">1 L</option>
+                        <option value="20 L" selected>20 L</option>
+                    </select>
+                </div>
+
+                <!-- Quantity -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Quantity</label>
+                    <input type="number" id="quantity" min="1" value="1" oninput="calculateTotal()" required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <!-- Rate per Bottle -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Rate per Bottle (₹)</label>
+                    <input type="number" id="rate" step="0.5" min="0" oninput="calculateTotal()" required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <!-- Total Amount -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Total Amount (₹)</label>
+                    <input type="number" id="totalAmount" step="0.5" readonly
+                        class="w-full bg-slate-200 text-slate-700 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold cursor-not-allowed">
+                </div>
+
+                <!-- Bottle Deposit Status -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Bottle Deposit Status</label>
+                    <select id="depositStatus" onchange="toggleDepositInput()" required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="Paid">Paid</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Not Applicable" selected>Not Applicable</option>
+                    </select>
+                </div>
+
+                <!-- Deposit Amount (Conditional) -->
+                <div id="depositAmountWrapper" class="hidden">
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Deposit Amount (₹)</label>
+                    <input type="number" id="depositAmount" min="0" value="0"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <!-- Bottle Returned Same Time -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Bottle Returned Same Time?</label>
+                    <select id="bottleReturned" required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="Yes" selected>Yes - Returned</option>
+                        <option value="No">No - Pending Return</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="sm:col-span-2 lg:col-span-3 flex justify-end gap-3 pt-2">
+                    <button type="reset" onclick="resetFormState()" class="px-5 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 text-sm font-medium transition">
+                        Reset
+                    </button>
+                    <button type="submit" class="px-6 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Save Entry
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Ledger Entries Table Section -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden block w-full">
+            <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-slate-50">
+                <h3 class="font-semibold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-table text-brand-600"></i> Daily Ledger Records
+                </h3>
+                <div class="flex flex-col sm:flex-row items-center gap-3">
+                    <div class="relative w-full sm:w-64">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="searchInput" oninput="renderTable()" placeholder="Search customer or building..."
+                            class="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <button onclick="clearAllData()" class="text-rose-600 hover:text-rose-700 text-xs font-semibold px-3 py-2 rounded-lg border border-rose-200 hover:bg-rose-50 transition whitespace-nowrap">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-600 uppercase text-xs tracking-wider border-b border-slate-200">
+                            <th class="py-3 px-4">Date & Time</th>
+                            <th class="py-3 px-4">Customer Details</th>
+                            <th class="py-3 px-4">Bottle Size</th>
+                            <th class="py-3 px-4 text-center">Qty & Rate</th>
+                            <th class="py-3 px-4 text-right">Amount</th>
+                            <th class="py-3 px-4">Deposit</th>
+                            <th class="py-3 px-4 text-center">Returned</th>
+                            <th class="py-3 px-4 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ledgerTableBody" class="divide-y divide-slate-200">
+                        <!-- Dynamic Rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden py-12 text-center">
+                <div class="text-slate-300 text-4xl mb-2">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <p class="text-slate-500 text-sm">No delivery entries recorded yet.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            AquaFlow Ledger &copy; 2026. All rights reserved. Built for seamless water delivery tracking.
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const bottlePrices = {
+            "200 ml": 3.5,
+            "500 ml": 10.0,
+            "1 L": 20.0,
+            "20 L": 60.0
+        };
+
+        let entries = JSON.parse(localStorage.getItem('aquaflow_entries')) || [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setCurrentDateTime();
+            updateDefaultRate();
+            renderTable();
+        });
+
+        function setCurrentDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            document.getElementById('entryDateTime').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        function updateDefaultRate() {
+            const size = document.getElementById('bottleSize').value;
+            const rateInput = document.getElementById('rate');
+            rateInput.value = bottlePrices[size] || 0;
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const qty = parseFloat(document.getElementById('quantity').value) || 0;
+            const rate = parseFloat(document.getElementById('rate').value) || 0;
+            document.getElementById('totalAmount').value = (qty * rate).toFixed(2);
+        }
+
+        function toggleDepositInput() {
+            const status = document.getElementById('depositStatus').value;
+            const wrapper = document.getElementById('depositAmountWrapper');
+            if (status === 'Paid' || status === 'Pending') {
+                wrapper.classList.remove('hidden');
+            } else {
+                wrapper.classList.add('hidden');
+                document.getElementById('depositAmount').value = 0;
+            }
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const entry = {
+                id: Date.now(),
+                dateTime: document.getElementById('entryDateTime').value,
+                customerName: document.getElementById('customerName').value.trim(),
+                buildingName: document.getElementById('buildingName').value.trim(),
+                floorRoom: document.getElementById('floorRoom').value.trim(),
+                bottleSize: document.getElementById('bottleSize').value,
+                quantity: parseInt(document.getElementById('quantity').value) || 1,
+                rate: parseFloat(document.getElementById('rate').value) || 0,
+                totalAmount: parseFloat(document.getElementById('totalAmount').value) || 0,
+                depositStatus: document.getElementById('depositStatus').value,
+                depositAmount: parseFloat(document.getElementById('depositAmount').value) || 0,
+                bottleReturned: document.getElementById('bottleReturned').value
+            };
+
+            entries.unshift(entry);
+            saveAndRefresh();
+            resetFormState();
+        }
+
+        function resetFormState() {
+            document.getElementById('deliveryForm').reset();
+            setCurrentDateTime();
+            updateDefaultRate();
+            toggleDepositInput();
+        }
+
+        function deleteEntry(id) {
+            if (confirm('Are you sure you want to delete this delivery entry?')) {
+                entries = entries.filter(item => item.id !== id);
+                saveAndRefresh();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Warning: This will delete all saved delivery entries. Proceed?')) {
+                entries = [];
+                saveAndRefresh();
+            }
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('aquaflow_entries', JSON.stringify(entries));
+            renderTable();
+        }
+
+        function formatDateTime(dtStr) {
+            if (!dtStr) return '';
+            const dt = new Date(dtStr);
+            return dt.toLocaleString('en-IN', { 
+                day: '2-digit', month: 'short', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit', hour12: true 
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('ledgerTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+            tbody.innerHTML = '';
+
+            const filteredEntries = entries.filter(item => 
+                item.customerName.toLowerCase().includes(searchVal) || 
+                item.buildingName.toLowerCase().includes(searchVal) ||
+                item.floorRoom.toLowerCase().includes(searchVal)
+            );
+
+            let totalRev = 0;
+            let totalDep = 0;
+            let pendingRet = 0;
+
+            entries.forEach(item => {
+                totalRev += item.totalAmount;
+                if (item.depositStatus === 'Paid') {
+                    totalDep += item.depositAmount;
+                }
+                if (item.bottleReturned === 'No') {
+                    pendingRet += item.quantity;
+                }
+            });
+
+            document.getElementById('statTotalEntries').innerText = entries.length;
+            document.getElementById('statTotalRevenue').innerText = `₹${totalRev.toFixed(2)}`;
+            document.getElementById('statTotalDeposit').innerText = `₹${totalDep.toFixed(2)}`;
+            document.getElementById('statPendingReturns').innerText = pendingRet;
+
+            if (filteredEntries.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            filteredEntries.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+
+                let depositBadge = `<span class="px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">N/A</span>`;
+                if (item.depositStatus === 'Paid') {
+                    depositBadge = `<span class="px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700">Paid: ₹${item.depositAmount}</span>`;
+                } else if (item.depositStatus === 'Pending') {
+                    depositBadge = `<span class="px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">Pending: ₹${item.depositAmount}</span>`;
+                }
+
+                let returnBadge = item.bottleReturned === 'Yes' 
+                    ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700"><i class="fa-solid fa-check text-[10px]"></i> Returned</span>`
+                    : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700"><i class="fa-solid fa-clock text-[10px]"></i> Pending</span>`;
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-xs text-slate-500 whitespace-nowrap">${formatDateTime(item.dateTime)}</td>
+                    <td class="py-3 px-4">
+                        <div class="font-semibold text-slate-800">${escapeHtml(item.customerName)}</div>
+                        <div class="text-xs text-slate-500">${escapeHtml(item.buildingName)} (${escapeHtml(item.floorRoom)})</div>
+                    </td>
+                    <td class="py-3 px-4 font-medium text-brand-700">${escapeHtml(item.bottleSize)}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="font-semibold">${item.quantity}</span> <span class="text-xs text-slate-400">× ₹${item.rate}</span>
+                    </td>
+                    <td class="py-3 px-4 text-right font-bold text-slate-700">₹${item.totalAmount.toFixed(2)}</td>
+                    <td class="py-3 px-4">${depositBadge}</td>
+                    <td class="py-3 px-4 text-center">${returnBadge}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="deleteEntry(${item.id})" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition" title="Delete Entry">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function exportToCSV() {
+            if (entries.length === 0) {
+                alert('No data available to export.');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Date & Time,Customer Name,Building,Floor/Room,Bottle Size,Quantity,Rate,Total Amount,Deposit Status,Deposit Amount,Bottle Returned\r\n";
+
+            entries.forEach(row => {
+                const rowData = [
+                    `"${row.dateTime}"`,
+                    `"${row.customerName}"`,
+                    `"${row.buildingName}"`,
+                    `"${row.floorRoom}"`,
+                    `"${row.bottleSize}"`,
+                    row.quantity,
+                    row.rate,
+                    row.totalAmount,
+                    `"${row.depositStatus}"`,
+                    row.depositAmount,
+                    `"${row.bottleReturned}"`
+                ];
+                csvContent += rowData.join(",") + "\r\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `AquaFlow_Ledger_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function sendViaEmail() {
+            if (entries.length === 0) {
+                alert('No delivery entries available to send.');
+                return;
+            }
+
+            let totalRev = 0;
+            let totalDep = 0;
+            let pendingRet = 0;
+
+            let bodyText = `AquaFlow Ledger - Daily Delivery Report\n`;
+            bodyText += `Generated on: ${new Date().toLocaleString()}\n`;
+            bodyText += `==========================================\n\n`;
+
+            entries.forEach((item, index) => {
+                totalRev += item.totalAmount;
+                if (item.depositStatus === 'Paid') totalDep += item.depositAmount;
+                if (item.bottleReturned === 'No') pendingRet += item.quantity;
+
+                bodyText += `${index + 1}. Customer: ${item.customerName}\n`;
+                bodyText += `   Building/Room: ${item.buildingName} (${item.floorRoom})\n`;
+                bodyText += `   Bottle: ${item.bottleSize} x ${item.quantity} = ₹${item.totalAmount}\n`;
+                bodyText += `   Deposit: ${item.depositStatus} (₹${item.depositAmount})\n`;
+                bodyText += `   Returned Same Time: ${item.bottleReturned}\n`;
+                bodyText += `   Time: ${formatDateTime(item.dateTime)}\n`;
+                bodyText += `------------------------------------------\n`;
+            });
+
+            bodyText += `\nSUMMARY TOTALS:\n`;
+            bodyText += `• Total Deliveries: ${entries.length}\n`;
+            bodyText += `• Total Revenue: ₹${totalRev.toFixed(2)}\n`;
+            bodyText += `• Total Deposit Collected: ₹${totalDep.toFixed(2)}\n`;
+            bodyText += `• Pending Bottle Returns: ${pendingRet}\n`;
+
+            const subject = encodeURIComponent(`AquaFlow Ledger Report - ${new Date().toLocaleDateString()}`);
+            const body = encodeURIComponent(bodyText);
+
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
